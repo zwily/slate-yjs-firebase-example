@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "docs": {
+      "$docid": {
+        ".read": true,
+        ".write": true
+      }
+    }
+  }
+}

@@ -12,3 +12,5 @@ compiled
 docs
 .eslintcache
 build
+.firebase
+.firebaserc

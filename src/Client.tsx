@@ -3,24 +3,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createEditor, Node } from "slate";
 import { withHistory } from "slate-history";
 import { withReact } from "slate-react";
-import {
-  SyncElement,
-  toSharedType,
-  useCursors,
-  withCursor,
-  withYjs,
-} from "slate-yjs";
-import { WebsocketProvider } from "y-websocket";
+import { SyncElement, useCursors, withCursor, withYjs } from "slate-yjs";
+import FirebaseProvider from "./FirebaseProvider";
 import * as Y from "yjs";
 import { Button, H4, Instance, Title } from "./Components";
 import EditorFrame from "./EditorFrame";
 import { withLinks } from "./plugins/link";
 import randomColor from "randomcolor";
-
-const WEBSOCKET_ENDPOINT =
-  process.env.NODE_ENV === "production"
-    ? "wss://demos.yjs.dev/slate-demo"
-    : "ws://localhost:1234";
 
 interface ClientProps {
   name: string;
@@ -29,6 +18,7 @@ interface ClientProps {
   removeUser: (id: any) => void;
 }
 
+// @refresh reset
 const Client: React.FC<ClientProps> = ({ id, name, slug, removeUser }) => {
   const [value, setValue] = useState<Node[]>([]);
   const [isOnline, setOnlineState] = useState<boolean>(false);
@@ -46,9 +36,7 @@ const Client: React.FC<ClientProps> = ({ id, name, slug, removeUser }) => {
   const [sharedType, provider] = useMemo(() => {
     const doc = new Y.Doc();
     const sharedType = doc.getArray<SyncElement>("content");
-    const provider = new WebsocketProvider(WEBSOCKET_ENDPOINT, slug, doc, {
-      connect: false,
-    });
+    const provider = new FirebaseProvider(slug, doc);
 
     return [sharedType, provider];
   }, [id]);
@@ -71,17 +59,6 @@ const Client: React.FC<ClientProps> = ({ id, name, slug, removeUser }) => {
       alphaColor: color.slice(0, -2) + "0.2)",
       color,
       name,
-    });
-
-    // Super hacky way to provide a initial value from the client, if
-    // you plan to use y-websocket in prod you probably should provide the
-    // initial state from the server.
-    provider.on("sync", (isSynced: boolean) => {
-      if (isSynced && sharedType.length === 0) {
-        toSharedType(sharedType, [
-          { type: "paragraph", children: [{ text: "Hello world!" }] },
-        ]);
-      }
     });
 
     provider.connect();
