@@ -1,10 +1,8 @@
 {
   "name": "slate-yjs-example",
-  "homepage": "https://bitphinix.github.io/slate-yjs-example",
   "version": "0.2.0",
   "scripts": {
-    "start:cra": "cross-env REACT_APP_BUILD_TARGET=src/website && react-scripts start",
-    "start:server": "cross-env HOST=localhost PORT=1234 && npx y-websocket-server",
+    "start": "cross-env REACT_APP_BUILD_TARGET=src/website && react-scripts start",
     "prebuild": "cp -f ./tsconfig.production.json ./tsconfig.json",
     "build": "cross-env NODE_ENV=production && react-scripts build",
     "dev": "concurrently \"yarn start:cra\" \"yarn serve\"",
